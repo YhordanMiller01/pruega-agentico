@@ -1,0 +1,150 @@
+{
+  "_leeme": "Resultado correcto esperado de cada agente de sq_ai al correr un ciclo contra este repo. 'salida' es lo CORRECTO; 'tolerancia' es el rango que se acepta porque los agentes con LLM no son deterministas (mismo SUT y mismas historias dieron 25 y 10 casos de pantalla en dos ciclos); 'observado' son los ciclos reales (c1 = fc7a687e sin 'servers' en el spec, c2 = 8613c2bb con 'servers'); una salida fuera de 'salida' que no es un defecto del SUT es un hallazgo de producto (Docs/bugs-locales.md del repo SQAi-Agentico). 'base': 'codigo' = comprobado ejecutando el SUT; 'historias' = docs/historias.md; 'observado'; 'criterio' = decisión de este archivo.",
+  "sut": {
+    "servicio": "tasks-api",
+    "puerto": 4010,
+    "contrato": "tasks-api/openapi.json",
+    "endpoints_total": 6,
+    "estado": "en memoria, sin semilla ni reset: el contenido de GET /tasks depende de lo creado antes"
+  },
+  "requisitos": [
+    {
+      "id": "HU-1/AC-1",
+      "peticion": "POST /tasks {\"title\":\"Comprar pan\"}",
+      "estado": 201,
+      "cuerpo": "id entero, title igual al enviado, done=false",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-1/AC-2",
+      "peticion": "POST /tasks {\"title\":\"\"}",
+      "estado": 422,
+      "base": "codigo"
+    },
+    {
+      "id": "HU-1/AC-3",
+      "peticion": "POST /tasks con title de 100 caracteres / de 101",
+      "estado": "201 / 422",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-2/AC-1",
+      "peticion": "GET /tasks",
+      "estado": 200,
+      "cuerpo": "lista (puede estar vacía)",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-2/AC-2",
+      "peticion": "GET /tasks/{id} de una tarea creada",
+      "estado": 200,
+      "cuerpo": "la misma tarea",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-2/AC-3",
+      "peticion": "GET /tasks/99999",
+      "estado": 404,
+      "base": "codigo"
+    },
+    {
+      "id": "HU-3/AC-1",
+      "peticion": "PATCH /tasks/{id} {\"done\":true}",
+      "estado": 200,
+      "cuerpo": "done=true",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-3/AC-2",
+      "peticion": "PATCH /tasks/99999 {\"done\":true}",
+      "estado": 404,
+      "base": "codigo"
+    },
+    {
+      "id": "HU-4/AC-1",
+      "peticion": "DELETE /tasks/{id}; luego GET /tasks/{id}",
+      "estado": "204; luego 404",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-4/AC-2",
+      "peticion": "DELETE /tasks/99999",
+      "estado": 404,
+      "base": "codigo"
+    }
+  ],
+  "huecos_conocidos_del_sut": [
+    "POST /tasks con title de solo espacios responde 201 (HU-1/AC-2 solo habla de título vacío)",
+    "POST /tasks acepta done=true (HU-1/AC-1 asume done=false)",
+    "PATCH /tasks/{id} con {} responde 200 sin cambiar nada",
+    "Las historias no cubren ids no numéricos (422) ni PATCH con title vacío (422)"
+  ],
+  "agentes": {
+    "F0.1": {
+      "salida": "mapa con 6 endpoints, módulos de API 'health' y 'tasks', dependency_edges vacío, sin cambio de arquitectura; HITL initial_system_map_review (primer mapa)",
+      "base": "codigo + observado (módulos health/tasks, 2026-10-07)"
+    },
+    "F1.3": {
+      "salida": "los criterios de aceptación de las 4 historias como condiciones, sin diferir ninguna del camino feliz, ambigüedades críticas 0",
+      "tolerancia": "15 o más condiciones listas; las condiciones son por frase, no una por AC, así que no se exige un número exacto ni el id AC-n",
+      "observado": "c1: 15 listas + 3 diferidas (incluida 'crear tarea con título válido'); c2: 15 listas + 1 diferida (el título de 101 caracteres). Todas inferidas, sin source_ac",
+      "base": "historias"
+    },
+    "F1.4": {
+      "salida": "risk_map con 'tasks' por encima de 'health' (más endpoints y de escritura); sin skips seguros de módulos críticos",
+      "base": "criterio (no hay historial ni PR: el riesgo por cambios es 0)"
+    },
+    "F1.5": {
+      "salida": "datasets para POST y PATCH /tasks con title de 1 a 100 caracteres; sin PII",
+      "base": "codigo"
+    },
+    "F1.6": {
+      "salida": "todos los casos con canal api y clasificación automated; ninguno manual (DELETE por id incluido); cada negativo se puede provocar por API",
+      "tolerancia": "45 a 46 casos; se acepta algún caso de pantalla solo si F2.1 está activo",
+      "observado": "c1: 25 ui, 13 api, 8 manuales; c2: 10 ui, 29 api, 6 manuales; negativo absurdo 'sin conexión a internet' para GET /tasks",
+      "base": "historias + criterio"
+    },
+    "F1.7": {
+      "salida": "pass_rate 1.0; todas las peticiones a http://sut:4010/<ruta>; el estado esperado de cada caso es el de la historia (201 al crear)",
+      "tolerancia": "sin infrastructure_failure; ningún 404 en POST /tasks; los fallos solo pueden venir de un defecto sembrado",
+      "observado": "c1: 4 casos, 404 en todos por URL /openapi.json/<ruta>; c2: 12 casos, 83,3 %, 2 fallos por un negativo atado a GET /tasks/1 (id existente); 17 casos bloqueados por datos",
+      "base": "codigo"
+    },
+    "F2.1": {
+      "salida": "omite todos los casos (no hay UI) o se deja apagado",
+      "base": "codigo"
+    },
+    "F2.1b": {
+      "salida": "0 casos asignados mientras F1.6 no clasifique ninguno como manual",
+      "tolerancia": "igual a los casos manuales de F1.6",
+      "observado": "c1: 8; c2: 6",
+      "base": "criterio"
+    },
+    "F2.2": {
+      "salida": "defects_total 0 con el SUT sin defectos: cualquier defecto registrado es un falso positivo del plan de pruebas",
+      "tolerancia": "0",
+      "observado": "c1: 1 (URL equivocada); c2: 2 (negativo atado a un id existente)",
+      "base": "codigo"
+    },
+    "F2.3": {
+      "salida": "3 reportes (ejecutivo, técnico, dataset Power BI) con la decisión de F1.2",
+      "base": "criterio"
+    },
+    "F2.4": {
+      "salida": "reqs_without_tests 0, orphan_test_cases 0, coverage_pct 100; total_reqs cuenta las condiciones de F1.3 (15 a 18), no los 10 AC",
+      "tolerancia": "exercised_pct sube a medida que F1.7 ejecuta más casos",
+      "observado": "c1: exercised 46,67 %; c2: 80,0 % (casos ejecutados 26 % y 40 %)",
+      "base": "historias"
+    },
+    "F2.5": {
+      "salida": "status no_apm_configured (el SUT no expone métricas)",
+      "base": "codigo"
+    },
+    "F1.2": {
+      "salida": "go solo si QS >= 75; hoy solo se evalúa la dimensión funcional (seguridad y rendimiento null)",
+      "tolerancia": "con pass_rate 1.0 y trazabilidad completa el QS funcional debería superar al del ciclo 2",
+      "observado": "c1: no_go 37,64; c2: no_go 60,55. No se sabe si un GO es alcanzable sin medir seguridad ni rendimiento",
+      "base": "pendiente de calibrar"
+    }
+  }
+}
