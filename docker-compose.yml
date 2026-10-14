@@ -1,0 +1,11 @@
+# SUT completo en local: API en :4010 y GUI en :8081 (la GUI reenvía /api/* a tasks-api).
+services:
+  tasks-api:
+    build: ./tasks-api
+    ports: ["4010:4010"]
+  tasks-web:
+    build: ./tasks-web
+    environment:
+      API_UPSTREAM: http://tasks-api:4010
+    ports: ["8081:8080"]
+    depends_on: [tasks-api]

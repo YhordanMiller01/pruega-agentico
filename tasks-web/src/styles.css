@@ -1,0 +1,19 @@
+:root { font-family: system-ui, sans-serif; color: #1f2933; background: #f5f7fa; }
+body { margin: 0; }
+.cabecera { background: #1f3a5f; color: #fff; padding: 12px 16px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.cabecera h1 { font-size: 1.25rem; margin: 0; }
+.cabecera nav { display: flex; gap: 16px; }
+.cabecera a { color: #dbe7f5; text-decoration: none; }
+.cabecera a.active { color: #fff; font-weight: 600; text-decoration: underline; }
+main { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #d9e2ec; }
+form { display: flex; flex-direction: column; gap: 8px; max-width: 420px; }
+input { padding: 8px; font-size: 1rem; }
+button { padding: 6px 12px; cursor: pointer; }
+.acciones { display: flex; gap: 8px; }
+.peligro { color: #b42318; }
+.error { color: #b42318; }
+.aviso { color: #1a7f37; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
+dt { font-weight: 600; }

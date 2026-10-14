@@ -5,7 +5,18 @@
     "puerto": 4010,
     "contrato": "tasks-api/openapi.json",
     "endpoints_total": 6,
-    "estado": "en memoria, sin semilla ni reset: el contenido de GET /tasks depende de lo creado antes"
+    "estado": "en memoria, sin semilla ni reset: el contenido de GET /tasks depende de lo creado antes",
+    "gui": {
+      "servicio": "tasks-web",
+      "puerto": 8080,
+      "pantallas": [
+        "/#/tareas",
+        "/#/tareas/nueva",
+        "/#/tareas/:id"
+      ],
+      "api_desde_gui": "/api/* -> tasks-api (nginx)",
+      "ui_base_url": "http://<host de tasks-web>/"
+    }
   },
   "requisitos": [
     {
@@ -71,6 +82,42 @@
       "peticion": "DELETE /tasks/99999",
       "estado": 404,
       "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-1",
+      "pantalla": "/#/tareas/nueva: título + \"Guardar tarea\"",
+      "resultado": "detalle con \"Tarea creada.\" y estado Pendiente",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-2",
+      "pantalla": "/#/tareas/nueva: \"Guardar tarea\" con título vacío",
+      "resultado": "role=alert \"El título es obligatorio y admite hasta 100 caracteres.\"",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-3",
+      "pantalla": "/#/tareas",
+      "resultado": "tabla con título y estado de cada tarea",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-4",
+      "pantalla": "/#/tareas: \"Completar\"",
+      "resultado": "role=status \"Tarea \\\"<título>\\\" completada.\" y estado Hecha",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-5",
+      "pantalla": "/#/tareas: \"Eliminar\"",
+      "resultado": "role=status \"Tarea \\\"<título>\\\" eliminada.\" y la fila desaparece",
+      "base": "codigo"
+    },
+    {
+      "id": "HU-5/AC-6",
+      "pantalla": "/#/tareas/99999",
+      "resultado": "role=alert \"La tarea no existe.\"",
+      "base": "codigo"
     }
   ],
   "huecos_conocidos_del_sut": [
@@ -81,7 +128,7 @@
   ],
   "agentes": {
     "F0.1": {
-      "salida": "mapa con 6 endpoints, módulos de API 'health' y 'tasks', dependency_edges vacío, sin cambio de arquitectura; HITL initial_system_map_review (primer mapa)",
+      "salida": "mapa con 6 endpoints, módulos de API 'health' y 'tasks', dependency_edges vacío, sin cambio de arquitectura; HITL initial_system_map_review (primer mapa); además ui_map de tasks-web con 3 pantallas (/#/tareas, /#/tareas/nueva, /#/tareas/:id) leído de tasks-web/src/App.jsx",
       "base": "codigo + observado (módulos health/tasks, 2026-10-07)"
     },
     "F1.3": {
@@ -99,8 +146,8 @@
       "base": "codigo"
     },
     "F1.6": {
-      "salida": "todos los casos con canal api y clasificación automated; ninguno manual (DELETE por id incluido); cada negativo se puede provocar por API",
-      "tolerancia": "45 a 46 casos; se acepta algún caso de pantalla solo si F2.1 está activo",
+      "salida": "casos de HU-1..HU-4 con canal api y automated; casos de HU-5 con canal ui (nombran una ruta /#/…); ninguno manual",
+      "tolerancia": "los casos ui deben salir de HU-5; un caso ui atribuido a HU-1..HU-4 es un hallazgo de producto",
       "observado": "c1: 25 ui, 13 api, 8 manuales; c2: 10 ui, 29 api, 6 manuales; negativo absurdo 'sin conexión a internet' para GET /tasks",
       "base": "historias + criterio"
     },
@@ -111,8 +158,10 @@
       "base": "codigo"
     },
     "F2.1": {
-      "salida": "omite todos los casos (no hay UI) o se deja apagado",
-      "base": "codigo"
+      "salida": "ejecuta los casos de HU-5 contra ui_base_url y pasan todos (el SUT no tiene defectos sembrados)",
+      "tolerancia": "sin no_ui_target ni auth_required (la GUI es anónima); los casos ui fuera de HU-5 pueden omitirse",
+      "requisito": "settings del proyecto: ui_base_url, ui_environment_type y ui_allowed_egress",
+      "base": "criterio (sin ciclo observado aún)"
     },
     "F2.1b": {
       "salida": "0 casos asignados mientras F1.6 no clasifique ninguno como manual",
@@ -131,7 +180,7 @@
       "base": "criterio"
     },
     "F2.4": {
-      "salida": "reqs_without_tests 0, orphan_test_cases 0, coverage_pct 100; total_reqs cuenta las condiciones de F1.3 (15 a 18), no los 10 AC",
+      "salida": "reqs_without_tests 0, orphan_test_cases 0, coverage_pct 100; total_reqs cuenta las condiciones de F1.3 (15 a 18), no los 16 AC",
       "tolerancia": "exercised_pct sube a medida que F1.7 ejecuta más casos",
       "observado": "c1: exercised 46,67 %; c2: 80,0 % (casos ejecutados 26 % y 40 %)",
       "base": "historias"
