@@ -97,3 +97,7 @@ def test_la_lista_arranca_con_las_tareas_semilla():
     titulos = {t["title"] for t in client.get("/tasks").json()}
     assert {"Comprar pan", "Pagar la luz", "Llamar al médico"} <= titulos
     assert client.get("/tasks/99999").status_code == 404
+
+
+def test_ruta_con_barra_final_no_existe():
+    assert client.get("/tasks/", follow_redirects=False).status_code == 404
