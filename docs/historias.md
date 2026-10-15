@@ -27,3 +27,14 @@ Como usuario quiero eliminar una tarea que ya no necesito.
 
 - AC-1: `DELETE /tasks/{id}` responde `204` y la tarea deja de existir.
 - AC-2: `DELETE /tasks/{id}` sobre una tarea inexistente responde `404`.
+
+## HU-5: Gestionar mis tareas desde la pantalla
+Como usuario quiero manejar mis tareas desde la interfaz web, sin llamar a la API.
+Pantallas: `/#/tareas` (lista), `/#/tareas/nueva` (formulario), `/#/tareas/{id}` (detalle).
+
+- AC-1: En la pantalla `/#/tareas/nueva`, al escribir un título en el campo "Título" y pulsar el botón "Guardar tarea", se abre el detalle de la tarea con el mensaje "Tarea creada." y el estado "Pendiente".
+- AC-2: En la pantalla `/#/tareas/nueva`, al pulsar "Guardar tarea" con el título vacío, aparece el mensaje de error "El título es obligatorio y admite hasta 100 caracteres." y no se crea la tarea.
+- AC-3: En la pantalla `/#/tareas`, la tabla muestra cada tarea creada con su título y su estado.
+- AC-4: En la pantalla `/#/tareas`, al pulsar el botón "Completar" de una tarea, aparece el mensaje `Tarea "<título>" completada.` y su estado pasa a "Hecha".
+- AC-5: En la pantalla `/#/tareas`, al pulsar el botón "Eliminar" de una tarea, aparece el mensaje `Tarea "<título>" eliminada.` y la tarea deja de verse en la tabla.
+- AC-6: Al abrir la pantalla `/#/tareas/99999`, aparece el mensaje "La tarea no existe.".

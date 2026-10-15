@@ -1,0 +1,57 @@
+# SUT de sq_ai en el clúster: API + GUI en un solo servicio, como demo-shop (imagen pública,
+# código por ConfigMap, sin construir ni firmar imágenes). Se aplica con kustomize desde la raíz:
+#
+#   kubectl apply -k .
+#
+#   API (F1.7):     http://tasks-demo.sqai-demo.svc.cluster.local:4010
+#   GUI (F2.1):     ui_base_url = http://tasks-demo.sqai-demo.svc.cluster.local:4010/
+#
+# Al arrancar instala requirements.txt con pip: el pod necesita salida a PyPI.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-demo
+  namespace: sqai-demo
+  labels: { app: tasks-demo }
+spec:
+  replicas: 1  # estado en memoria: con más de una réplica cada pod tendría sus propias tareas
+  selector:
+    matchLabels: { app: tasks-demo }
+  template:
+    metadata:
+      labels: { app: tasks-demo }
+    spec:
+      containers:
+        - name: tasks-api
+          image: python:3.12-slim
+          workingDir: /srv
+          command: ["sh", "-c"]
+          args:
+            - pip install --no-cache-dir -q -r /code/requirements.txt &&
+              mkdir -p app/static && cp /code/main.py /code/__init__.py app/ &&
+              cp /code/index.html app/static/ &&
+              exec uvicorn app.main:app --host 0.0.0.0 --port 4010
+          ports:
+            - containerPort: 4010
+          readinessProbe:
+            httpGet: { path: /health, port: 4010 }
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+          volumeMounts:
+            - { name: code, mountPath: /code }
+      volumes:
+        - name: code
+          configMap: { name: tasks-demo-code }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasks-demo
+  namespace: sqai-demo
+spec:
+  selector: { app: tasks-demo }
+  ports:
+    - { port: 4010, targetPort: 4010 }

@@ -1,0 +1,5 @@
+# SUT completo en local: API y GUI en http://localhost:4010 (la GUI en "/", la API en /tasks).
+services:
+  tasks-api:
+    build: ./tasks-api
+    ports: ["4010:4010"]

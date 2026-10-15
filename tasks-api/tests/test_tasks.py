@@ -66,3 +66,10 @@ def test_el_contrato_declara_los_404():
 
 def test_el_contrato_declara_servers():
     assert app.openapi()["servers"] == [{"url": "/"}]
+
+
+# --- GUI (tasks-web) servida por la misma app; fuera del contrato ---
+def test_gui_en_la_raiz_y_fuera_del_contrato():
+    r = client.get("/")
+    assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+    assert "/" not in app.openapi()["paths"]
