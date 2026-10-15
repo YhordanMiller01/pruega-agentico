@@ -1,4 +1,6 @@
 """API de tareas en memoria: sistema bajo prueba (SUT) para el camino feliz de sq_ai."""
+import os
+import secrets
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Response
@@ -38,6 +40,26 @@ _GUI = Path(__file__).parent / "static" / "index.html"
 @app.get("/", include_in_schema=False)
 def gui() -> FileResponse:
     return FileResponse(_GUI)
+
+
+# Login de demo para la identidad `ui` de sq_ai (F2.1): devuelve un token que F2.1 guarda en
+# localStorage['token'] antes de navegar. La API y la GUI siguen siendo públicas —el token no
+# se exige en ningún endpoint—; existe para que la corrida de UI se declare autenticada.
+# Fuera del contrato: el OpenAPI sigue con 6 endpoints.
+_DEMO_EMAIL = os.environ.get("DEMO_EMAIL", "demo@pruega.local")
+_DEMO_PASSWORD = os.environ.get("DEMO_PASSWORD", "demo1234")
+
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/auth/login", include_in_schema=False)
+def login(body: LoginIn) -> dict:
+    if body.email != _DEMO_EMAIL or body.password != _DEMO_PASSWORD:
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+    return {"token": secrets.token_urlsafe(24)}
 
 
 @app.get("/health")

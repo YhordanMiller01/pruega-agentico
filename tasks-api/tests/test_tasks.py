@@ -73,3 +73,20 @@ def test_gui_en_la_raiz_y_fuera_del_contrato():
     r = client.get("/")
     assert r.status_code == 200 and "text/html" in r.headers["content-type"]
     assert "/" not in app.openapi()["paths"]
+
+
+# --- Login de demo para la identidad `ui` de sq_ai; fuera del contrato ---
+def test_login_de_demo_devuelve_token():
+    r = client.post("/auth/login", json={"email": "demo@pruega.local", "password": "demo1234"})
+    assert r.status_code == 200 and r.json()["token"]
+
+
+def test_login_con_credenciales_malas_responde_401():
+    r = client.post("/auth/login", json={"email": "demo@pruega.local", "password": "x"})
+    assert r.status_code == 401
+
+
+def test_login_fuera_del_contrato_y_la_api_sigue_publica():
+    assert "/auth/login" not in app.openapi()["paths"]
+    assert len(app.openapi()["paths"]) == 3  # /health, /tasks, /tasks/{task_id}: 6 endpoints
+    assert client.get("/tasks").status_code == 200  # sin token

@@ -1,7 +1,7 @@
-# kubectl apply -k .   (ver deploy/tasks-demo.yaml)
+# kubectl apply -k .   (ver tasks-api/deploy-k8s.yaml)
 # El ConfigMap sale de los ficheros reales del repo: no hay copias que se desincronicen.
 resources:
-  - deploy/tasks-demo.yaml
+  - tasks-api/deploy-k8s.yaml
 configMapGenerator:
   - name: tasks-demo-code
     namespace: sqai-demo

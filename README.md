@@ -7,15 +7,15 @@ pruega-agentico/
 ├── docs/historias.md      # 5 historias, 16 criterios de aceptación (HU-5 = pantallas)
 ├── docs/esperado.json     # resultado correcto esperado de cada agente de sq_ai
 ├── kustomization.yaml     # kubectl apply -k .  → despliega el SUT en el clúster
-├── deploy/tasks-demo.yaml # Deployment + Service (namespace sqai-demo, imagen pública)
 ├── docker-compose.yml     # SUT en local (:4010)
 ├── tasks-api/             # servicio (carpeta de primer nivel = servicio para el escaneo de F0.1)
-│   ├── app/main.py        # FastAPI, 6 endpoints + la GUI en "/" (fuera del contrato)
+│   ├── app/main.py        # FastAPI, 6 endpoints + GUI en "/" y login de demo (fuera del contrato)
 │   ├── app/static/        # GUI compilada (un solo index.html; la genera tasks-web)
 │   ├── openapi.json       # contrato (generado desde la app)
+│   ├── deploy-k8s.yaml    # Deployment + Service (namespace sqai-demo, imagen pública)
 │   ├── Dockerfile         # imagen del SUT (puerto 4010)
 │   ├── requirements.txt   # manifiesto del servicio, versiones fijadas
-│   └── tests/             # 13 pruebas pytest
+│   └── tests/             # 16 pruebas pytest
 └── tasks-web/             # fuente de la GUI: Vite + React + React Router (HashRouter)
     └── src/App.jsx        # router: F0.1 saca de aquí el ui_map (/#/tareas, /#/tareas/nueva, /#/tareas/:id)
 ```
@@ -53,13 +53,24 @@ Configuración del **proyecto** en sq_ai:
 
 Sin `ui_base_url`, F2.1 omite todos los casos con `no_ui_target`.
 
+### Identidad `ui` (sesión de F2.1)
+
+La app es pública, pero F2.1 declara la corrida como **no autenticada** (`auth_required`, cobertura PARCIAL) si el proyecto no tiene identidad `ui`. Para eso la API trae un login de demo, `POST /auth/login`, fuera del contrato: con `{"email","password"}` correctos responde `{"token": "..."}` y F2.1 guarda ese token en `localStorage['token']` antes de navegar. Ningún endpoint exige el token.
+
+| Dónde | Clave | Valor |
+|---|---|---|
+| `config_jsonb` del conector `openapi` | `auth_login_path` | `/auth/login` |
+| Secreto del conector `openapi` | `ui_email` / `ui_password` | `demo@pruega.local` / `demo1234` (cámbialos con `DEMO_EMAIL` / `DEMO_PASSWORD`) |
+
+Solo se declara la identidad `ui`: sin `email`/`password` en el secreto, F1.7 sigue llamando a la API sin login.
+
 ## Ejecutar la API
 
 ```bash
 cd tasks-api
 python -m venv .venv && . .venv/Scripts/activate   # en Linux/macOS: . .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest -q                      # 13 pruebas
+python -m pytest -q                      # 16 pruebas
 python -m uvicorn app.main:app --port 4010
 ```
 
