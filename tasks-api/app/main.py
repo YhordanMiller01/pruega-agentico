@@ -1,10 +1,11 @@
 """API de tareas en memoria: sistema bajo prueba (SUT) para el camino feliz de sq_ai."""
+import json
 import os
 import secrets
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 # `servers` declara la base de las peticiones; sin él, sq_ai usa la URL del propio openapi.json.
@@ -45,8 +46,13 @@ _GUI = Path(__file__).parent / "static" / "index.html"
 
 
 @app.get("/", include_in_schema=False)
-def gui() -> FileResponse:
-    return FileResponse(_GUI)
+def gui() -> HTMLResponse:
+    # Las tareas actuales viajan en el HTML (window.__TAREAS__) para que la lista se pinte sin
+    # esperar al fetch: F2.1 captura su inventario al cargar y antes la tabla aún no existía.
+    datos = json.dumps(list(_tasks.values()), ensure_ascii=False).replace("</", "<\\/")
+    html = _GUI.read_text(encoding="utf-8").replace(
+        "</head>", f"<script>window.__TAREAS__={datos};</script></head>", 1)
+    return HTMLResponse(html)
 
 
 # Login de demo para la identidad `ui` de sq_ai (F2.1): devuelve un token que F2.1 guarda en

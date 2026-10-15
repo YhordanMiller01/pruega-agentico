@@ -15,7 +15,7 @@ pruega-agentico/
 │   ├── deploy-k8s.yaml    # Deployment + Service (namespace sqai-demo, imagen pública)
 │   ├── Dockerfile         # imagen del SUT (puerto 4010)
 │   ├── requirements.txt   # manifiesto del servicio, versiones fijadas
-│   └── tests/             # 18 pruebas pytest
+│   └── tests/             # 19 pruebas pytest
 └── tasks-web/             # fuente de la GUI: Vite + React + React Router (HashRouter)
     └── src/App.jsx        # router: F0.1 saca de aquí el ui_map (/#/tareas, /#/tareas/nueva, /#/tareas/:id)
 ```
@@ -27,6 +27,9 @@ La API sirve la GUI en `/`: un solo servicio y una sola URL para F1.7 y F2.1. La
 - **Anónima**: sin login.
 - **Accesible a propósito**, porque F2.1 localiza los elementos por rol y por nombre: los inputs tienen `<label>`, los botones tienen texto, los errores salen en `role="alert"`, los avisos en `role="status"` y la carga se marca con `aria-busy`.
 - **Sin validación en el cliente**: los mensajes de 422 y 404 los provoca la API, así que la UI y la API no pueden contradecirse.
+- **Datos en el HTML**: la API inyecta las tareas actuales como `window.__TAREAS__`, así lista y detalle se pintan en el primer render (F2.1 captura su inventario al cargar).
+- **Menú distinto de los títulos** ("Ver lista" / "Agregar tarea" frente a "Lista de tareas" / "Nueva tarea"): si coincidieran, el título ya estaría visible antes de navegar y F2.1 descartaría el oráculo por tautológico.
+- **Mensajes sin comillas internas**: `Tarea completada: <título>.` / `Tarea eliminada: <título>.`.
 - **Un solo HTML con el JS inline**, porque el CSP del clúster no deja cargar scripts aparte.
 
 Si cambias `tasks-web/src`, regenera la GUI y commitea `tasks-api/app/static/index.html`:
@@ -70,7 +73,7 @@ Solo se declara la identidad `ui`: sin `email`/`password` en el secreto, F1.7 si
 cd tasks-api
 python -m venv .venv && . .venv/Scripts/activate   # en Linux/macOS: . .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest -q                      # 18 pruebas
+python -m pytest -q                      # 19 pruebas
 python -m uvicorn app.main:app --port 4010
 ```
 

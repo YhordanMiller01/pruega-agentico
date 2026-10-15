@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { listarTareas, completarTarea, eliminarTarea } from "../api";
 
 export default function ListaTareas() {
-  const [tareas, setTareas] = useState(null);
+  // La API inyecta las tareas en el HTML (window.__TAREAS__): la tabla se pinta en el primer
+  // render, sin "Cargando…", y el inventario de F2.1 ve las filas y sus botones.
+  const [tareas, setTareas] = useState(() => window.__TAREAS__ ?? null);
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState("");
 
@@ -16,7 +18,7 @@ export default function ListaTareas() {
     setError(""); setAviso("");
     try {
       await completarTarea(t.id);
-      setAviso(`Tarea "${t.title}" completada.`);
+      setAviso(`Tarea completada: ${t.title}.`);
       cargar();
     } catch (e) { setError(e.message); }
   };
@@ -25,7 +27,7 @@ export default function ListaTareas() {
     setError(""); setAviso("");
     try {
       await eliminarTarea(t.id);
-      setAviso(`Tarea "${t.title}" eliminada.`);
+      setAviso(`Tarea eliminada: ${t.title}.`);
       cargar();
     } catch (e) { setError(e.message); }
   };

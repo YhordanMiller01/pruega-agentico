@@ -101,3 +101,8 @@ def test_la_lista_arranca_con_las_tareas_semilla():
 
 def test_ruta_con_barra_final_no_existe():
     assert client.get("/tasks/", follow_redirects=False).status_code == 404
+
+
+def test_la_gui_trae_las_tareas_inyectadas_para_pintarse_sin_esperar():
+    html = client.get("/").text
+    assert "window.__TAREAS__=" in html and "Comprar pan" in html

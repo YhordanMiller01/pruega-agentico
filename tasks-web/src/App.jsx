@@ -9,9 +9,11 @@ export default function App() {
     <HashRouter>
       <header className="cabecera">
         <h1>Mis tareas</h1>
+        {/* Textos del menú distintos de los títulos de pantalla: si coinciden, el título
+            "ya estaba visible" antes de navegar y F2.1 descarta el oráculo por tautológico. */}
         <nav aria-label="Principal">
-          <NavLink to="/tareas" end>Lista de tareas</NavLink>
-          <NavLink to="/tareas/nueva">Nueva tarea</NavLink>
+          <NavLink to="/tareas" end>Ver lista</NavLink>
+          <NavLink to="/tareas/nueva">Agregar tarea</NavLink>
         </nav>
       </header>
       <main>

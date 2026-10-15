@@ -6,7 +6,9 @@ export default function DetalleTarea() {
   const { id } = useParams();
   const { state } = useLocation();
   const navegar = useNavigate();
-  const [tarea, setTarea] = useState(null);
+  // Igual que la lista: si la tarea viene en el HTML se pinta sin esperar al fetch.
+  const [tarea, setTarea] = useState(
+    () => (window.__TAREAS__ ?? []).find((t) => String(t.id) === id) ?? null);
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState(state?.aviso ?? "");
 
