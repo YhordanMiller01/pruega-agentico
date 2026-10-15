@@ -1,5 +1,8 @@
 """API de tareas en memoria: sistema bajo prueba (SUT) para el camino feliz de sq_ai."""
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 # `servers` declara la base de las peticiones; sin él, sq_ai usa la URL del propio openapi.json.
@@ -25,6 +28,16 @@ class Task(BaseModel):
     id: int
     title: str
     done: bool
+
+
+# GUI de tasks-web (un solo HTML, `npm run build` en tasks-web). Fuera del contrato: el
+# OpenAPI sigue con 6 endpoints. Navega con HashRouter, así que no choca con /tasks.
+_GUI = Path(__file__).parent / "static" / "index.html"
+
+
+@app.get("/", include_in_schema=False)
+def gui() -> FileResponse:
+    return FileResponse(_GUI)
 
 
 @app.get("/health")

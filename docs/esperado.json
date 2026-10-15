@@ -7,15 +7,14 @@
     "endpoints_total": 6,
     "estado": "en memoria, sin semilla ni reset: el contenido de GET /tasks depende de lo creado antes",
     "gui": {
-      "servicio": "tasks-web",
-      "puerto": 8080,
+      "fuente": "tasks-web (Vite + React + HashRouter)",
+      "servida_por": "tasks-api en \"/\" (fuera del contrato)",
       "pantallas": [
         "/#/tareas",
         "/#/tareas/nueva",
         "/#/tareas/:id"
       ],
-      "api_desde_gui": "/api/* -> tasks-api (nginx)",
-      "ui_base_url": "http://<host de tasks-web>/"
+      "ui_base_url": "http://tasks-demo.sqai-demo.svc.cluster.local:4010/"
     }
   },
   "requisitos": [

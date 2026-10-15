@@ -1,11 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
-// En local, /api va a la API (uvicorn en :4010); en el contenedor lo hace nginx.
+// La GUI sale como UN index.html con el JS y el CSS inline (el CSP del clúster no deja cargar
+// scripts aparte) y se escribe dentro de tasks-api, que la sirve en "/".
+// En local (npm run dev) las llamadas a la API van a uvicorn en :4010.
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), viteSingleFile()],
+  build: { outDir: "../tasks-api/app/static", emptyOutDir: true },
   server: {
     port: 5180,
-    proxy: { "/api": { target: "http://localhost:4010", rewrite: (p) => p.replace(/^\/api/, "") } },
+    proxy: { "/tasks": "http://localhost:4010", "/health": "http://localhost:4010" },
   },
 });

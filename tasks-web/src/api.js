@@ -1,5 +1,5 @@
-// Mismo origen: nginx (contenedor) o Vite (local) reenvían /api/* a tasks-api.
-const BASE = "/api";
+// Mismo origen: tasks-api sirve esta GUI en "/" y la API en /tasks (en local, Vite reenvía).
+const BASE = "";
 
 async function pedir(ruta, opciones = {}) {
   const r = await fetch(BASE + ruta, {
