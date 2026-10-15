@@ -127,7 +127,6 @@
   "huecos_conocidos_del_sut": [
     "POST /tasks con title de solo espacios responde 201 (HU-1/AC-2 solo habla de título vacío)",
     "POST /tasks acepta done=true (HU-1/AC-1 asume done=false)",
-    "PATCH /tasks/{id} con {} responde 200 sin cambiar nada",
     "Las historias no cubren ids no numéricos (422) ni PATCH con title vacío (422)"
   ],
   "agentes": {

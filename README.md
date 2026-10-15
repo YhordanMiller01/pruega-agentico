@@ -15,7 +15,7 @@ pruega-agentico/
 │   ├── deploy-k8s.yaml    # Deployment + Service (namespace sqai-demo, imagen pública)
 │   ├── Dockerfile         # imagen del SUT (puerto 4010)
 │   ├── requirements.txt   # manifiesto del servicio, versiones fijadas
-│   └── tests/             # 19 pruebas pytest
+│   └── tests/             # 20 pruebas pytest
 └── tasks-web/             # fuente de la GUI: Vite + React + React Router (HashRouter)
     └── src/App.jsx        # router: F0.1 saca de aquí el ui_map (/#/tareas, /#/tareas/nueva, /#/tareas/:id)
 ```
@@ -73,7 +73,7 @@ Solo se declara la identidad `ui`: sin `email`/`password` en el secreto, F1.7 si
 cd tasks-api
 python -m venv .venv && . .venv/Scripts/activate   # en Linux/macOS: . .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest -q                      # 19 pruebas
+python -m pytest -q                      # 20 pruebas
 python -m uvicorn app.main:app --port 4010
 ```
 

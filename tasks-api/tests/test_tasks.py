@@ -106,3 +106,7 @@ def test_ruta_con_barra_final_no_existe():
 def test_la_gui_trae_las_tareas_inyectadas_para_pintarse_sin_esperar():
     html = client.get("/").text
     assert "window.__TAREAS__=" in html and "Comprar pan" in html
+
+
+def test_patch_sin_campos_se_rechaza():
+    assert client.patch("/tasks/1", json={}).status_code == 422

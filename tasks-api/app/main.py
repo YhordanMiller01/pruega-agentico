@@ -105,7 +105,10 @@ def get_task(task_id: int) -> dict:
 def update_task(task_id: int, body: TaskPatch) -> dict:
     if task_id not in _tasks:
         raise HTTPException(status_code=404, detail="Task not found")
-    _tasks[task_id].update(body.model_dump(exclude_none=True))
+    cambios = body.model_dump(exclude_none=True)
+    if not cambios:  # PATCH sin campos: nada que actualizar, es un cuerpo inválido
+        raise HTTPException(status_code=422, detail="Indica al menos title o done")
+    _tasks[task_id].update(cambios)
     return _tasks[task_id]
 
 
