@@ -12,8 +12,14 @@ app = FastAPI(title="Tasks API", version="1.0.0", servers=[{"url": "/"}])
 
 _NOT_FOUND = {404: {"description": "Task not found"}}
 
+# Semilla: la lista arranca con tareas para que la pantalla /#/tareas tenga filas y botones
+# (Completar/Eliminar) que F2.1 pueda ver; sin ella su inventario salía vacío. SEED_TASKS=0
+# la desactiva.
+_SEMILLA = ["Comprar pan", "Pagar la luz", "Llamar al médico"]
 _tasks: dict[int, dict] = {}
-_next_id = 1
+if os.environ.get("SEED_TASKS", "1") != "0":
+    _tasks = {i: {"id": i, "title": t, "done": False} for i, t in enumerate(_SEMILLA, start=1)}
+_next_id = len(_tasks) + 1
 
 
 class TaskIn(BaseModel):

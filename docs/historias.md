@@ -35,11 +35,12 @@ Acceso: público, sin inicio de sesión, sin token ni usuario; cualquier visitan
 ## HU-5: Gestionar mis tareas desde la pantalla
 Como usuario quiero manejar mis tareas desde la interfaz web, sin llamar a la API.
 Acceso: público, sin inicio de sesión, sin token ni usuario; cualquier visitante anónimo puede usarla. La interfaz se abre directamente en la pantalla indicada, sin pantalla de login.
+La lista arranca con tres tareas precargadas: "Comprar pan", "Pagar la luz" y "Llamar al médico", todas en estado "Pendiente".
 Pantallas: `/#/tareas` (lista), `/#/tareas/nueva` (formulario), `/#/tareas/{id}` (detalle).
 
 - AC-1: En la pantalla `/#/tareas/nueva`, al escribir un título en el campo "Título" y pulsar el botón "Guardar tarea", se abre el detalle de la tarea con el mensaje "Tarea creada." y el estado "Pendiente".
 - AC-2: En la pantalla `/#/tareas/nueva`, al pulsar "Guardar tarea" con el título vacío, aparece el mensaje de error "El título es obligatorio y admite hasta 100 caracteres." y no se crea la tarea.
-- AC-3: En la pantalla `/#/tareas`, la tabla muestra cada tarea creada con su título y su estado.
-- AC-4: Con una tarea creada antes desde `/#/tareas/nueva`, en la pantalla `/#/tareas`, al pulsar el botón "Completar" de una tarea, aparece el mensaje `Tarea "<título>" completada.` y su estado pasa a "Hecha".
-- AC-5: Con una tarea creada antes desde `/#/tareas/nueva`, en la pantalla `/#/tareas`, al pulsar el botón "Eliminar" de una tarea, aparece el mensaje `Tarea "<título>" eliminada.` y la tarea deja de verse en la tabla.
+- AC-3: En la pantalla `/#/tareas`, la tabla muestra la fila "Comprar pan" con el estado "Pendiente".
+- AC-4: En la pantalla `/#/tareas`, al pulsar el botón "Completar Pagar la luz", aparece el mensaje `Tarea "Pagar la luz" completada.` y su estado pasa a "Hecha".
+- AC-5: En la pantalla `/#/tareas`, al pulsar el botón "Eliminar Llamar al médico", aparece el mensaje `Tarea "Llamar al médico" eliminada.` y esa fila deja de verse en la tabla.
 - AC-6: Al abrir la pantalla `/#/tareas/99999`, aparece el mensaje "La tarea no existe.".

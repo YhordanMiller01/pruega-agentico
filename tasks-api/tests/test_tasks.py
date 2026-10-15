@@ -90,3 +90,10 @@ def test_login_fuera_del_contrato_y_la_api_sigue_publica():
     assert "/auth/login" not in app.openapi()["paths"]
     assert len(app.openapi()["paths"]) == 3  # /health, /tasks, /tasks/{task_id}: 6 endpoints
     assert client.get("/tasks").status_code == 200  # sin token
+
+
+# --- Semilla: la pantalla de lista arranca con filas ---
+def test_la_lista_arranca_con_las_tareas_semilla():
+    titulos = {t["title"] for t in client.get("/tasks").json()}
+    assert {"Comprar pan", "Pagar la luz", "Llamar al médico"} <= titulos
+    assert client.get("/tasks/99999").status_code == 404

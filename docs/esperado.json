@@ -5,7 +5,7 @@
     "puerto": 4010,
     "contrato": "tasks-api/openapi.json",
     "endpoints_total": 6,
-    "estado": "en memoria, sin semilla ni reset: el contenido de GET /tasks depende de lo creado antes",
+    "estado": "en memoria; arranca con 3 tareas semilla (ids 1-3: Comprar pan, Pagar la luz, Llamar al médico; SEED_TASKS=0 la quita); sin reset entre peticiones",
     "gui": {
       "fuente": "tasks-web (Vite + React + HashRouter)",
       "servida_por": "tasks-api en \"/\" (fuera del contrato)",
