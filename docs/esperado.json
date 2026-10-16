@@ -108,13 +108,13 @@
     {
       "id": "HU-5/AC-4",
       "pantalla": "/#/tareas: \"Completar\"",
-      "resultado": "role=status \"Tarea \\\"<título>\\\" completada.\" y estado Hecha",
+      "resultado": "role=status \"Tarea completada: <título>.\" y estado Hecha",
       "base": "codigo"
     },
     {
       "id": "HU-5/AC-5",
       "pantalla": "/#/tareas: \"Eliminar\"",
-      "resultado": "role=status \"Tarea \\\"<título>\\\" eliminada.\" y la fila desaparece",
+      "resultado": "role=status \"Tarea eliminada: <título>.\" y la fila desaparece",
       "base": "codigo"
     },
     {

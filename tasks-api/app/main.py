@@ -18,9 +18,21 @@ _NOT_FOUND = {404: {"description": "Task not found"}}
 # (Completar/Eliminar) que F2.1 pueda ver; sin ella su inventario salía vacío. SEED_TASKS=0
 # la desactiva.
 _SEMILLA = ["Comprar pan", "Pagar la luz", "Llamar al médico"]
+_CON_SEMILLA = os.environ.get("SEED_TASKS", "1") != "0"
 _tasks: dict[int, dict] = {}
-if os.environ.get("SEED_TASKS", "1") != "0":
-    _tasks = {i: {"id": i, "title": t, "done": False} for i, t in enumerate(_SEMILLA, start=1)}
+
+
+def _restaurar_semilla() -> None:
+    # Las tareas semilla vuelven a su estado inicial (Pendiente, título original). Sin esto,
+    # el primer caso de HU-5/AC-4 deja "Pagar la luz" en Hecha (botón Completar deshabilitado)
+    # y el de AC-5 borra "Llamar al médico": el re-run de F2.1, el siguiente ciclo o cualquier
+    # PATCH/DELETE de F1.7 sobre los ids 1-3 hacían fallar esos casos sin defecto del SUT.
+    for i, t in enumerate(_SEMILLA, start=1):
+        _tasks[i] = {"id": i, "title": t, "done": False}
+
+
+if _CON_SEMILLA:
+    _restaurar_semilla()
 _next_id = len(_tasks) + 1
 
 
@@ -49,6 +61,10 @@ _GUI = Path(__file__).parent / "static" / "index.html"
 def gui() -> HTMLResponse:
     # Las tareas actuales viajan en el HTML (window.__TAREAS__) para que la lista se pinte sin
     # esperar al fetch: F2.1 captura su inventario al cargar y antes la tabla aún no existía.
+    # Cada caso de F2.1 abre la GUI desde cero: aquí la semilla vuelve a su estado inicial
+    # para que los casos de HU-5 no dependan del orden ni de corridas anteriores.
+    if _CON_SEMILLA:
+        _restaurar_semilla()
     datos = json.dumps(list(_tasks.values()), ensure_ascii=False).replace("</", "<\\/")
     html = _GUI.read_text(encoding="utf-8").replace(
         "</head>", f"<script>window.__TAREAS__={datos};</script></head>", 1)

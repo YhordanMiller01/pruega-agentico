@@ -110,3 +110,12 @@ def test_la_gui_trae_las_tareas_inyectadas_para_pintarse_sin_esperar():
 
 def test_patch_sin_campos_se_rechaza():
     assert client.patch("/tasks/1", json={}).status_code == 422
+
+
+def test_abrir_la_gui_restaura_las_tareas_semilla():
+    # HU-5/AC-4 y AC-5 cambian la semilla; el siguiente caso (o el re-run) debe encontrarla intacta.
+    client.patch("/tasks/2", json={"done": True})
+    client.delete("/tasks/3")
+    client.get("/")
+    assert client.get("/tasks/2").json() == {"id": 2, "title": "Pagar la luz", "done": False}
+    assert client.get("/tasks/3").json()["title"] == "Llamar al médico"
