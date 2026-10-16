@@ -3,7 +3,8 @@ const BASE = "";
 
 async function pedir(ruta, opciones = {}) {
   const r = await fetch(BASE + ruta, {
-    headers: { "Content-Type": "application/json" },
+    // X-Origen: la API distingue las altas hechas desde la GUI (modo deriva, AB#3068).
+    headers: { "Content-Type": "application/json", "X-Origen": "gui" },
     ...opciones,
   });
   if (r.status === 204) return null;

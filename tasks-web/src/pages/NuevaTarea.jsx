@@ -31,7 +31,10 @@ export default function NuevaTarea() {
           onChange={(e) => setTitulo(e.target.value)} aria-invalid={Boolean(error)}
           aria-describedby={error ? "error-titulo" : undefined} />
         {error && <p id="error-titulo" role="alert" className="error">{error}</p>}
-        <button type="submit" disabled={enviando} aria-busy={enviando}>Guardar tarea</button>
+        {/* El rótulo lo inyecta la API: en modo deriva cambia a «Guardar la tarea» (AB#3068). */}
+        <button type="submit" disabled={enviando} aria-busy={enviando}>
+          {window.__ROTULO_GUARDAR__ ?? "Guardar tarea"}
+        </button>
       </form>
     </section>
   );

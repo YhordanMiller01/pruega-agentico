@@ -1,3 +1,5 @@
+import json
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -119,3 +121,22 @@ def test_abrir_la_gui_restaura_las_tareas_semilla():
     client.get("/")
     assert client.get("/tasks/2").json() == {"id": 2, "title": "Pagar la luz", "done": False}
     assert client.get("/tasks/3").json()["title"] == "Llamar al médico"
+
+
+# --- Modo deriva (AB#3068): solo para probar el self-healing de F2.1 ---
+def test_deriva_apagada_el_rotulo_no_cambia():
+    client.post("/__deriva", json={"activa": False})
+    client.post("/tasks", json={"title": "x"}, headers={"X-Origen": "gui"})
+    assert '"Guardar tarea"' in client.get("/").text
+
+
+def test_deriva_activa_solo_un_alta_desde_la_gui_renombra_el_boton():
+    client.post("/__deriva", json={"activa": True})
+    client.post("/tasks", json={"title": "por api"})          # F1.7: no dispara
+    assert '"Guardar tarea"' in client.get("/").text
+    client.post("/tasks", json={"title": "por gui"}, headers={"X-Origen": "gui"})
+    assert '"Guardar la tarea"' in client.get("/").text
+    client.post("/__deriva", json={"activa": False})            # vuelve al original
+    assert '"Guardar tarea"' in client.get("/").text
+    assert "/__deriva" not in app.openapi()["paths"]
+    assert "x-origen" not in json.dumps(app.openapi()).lower()

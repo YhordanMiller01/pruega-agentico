@@ -4,7 +4,7 @@ import os
 import secrets
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
@@ -57,6 +57,28 @@ class Task(BaseModel):
 _GUI = Path(__file__).parent / "static" / "index.html"
 
 
+# Modo deriva (para probar el self-healing de F2.1, AB#3068). Apagado por defecto: se activa
+# con SUT_DERIVA_UI=1 o con POST /__deriva {"activa": true}. Activado, la primera alta de
+# tarea hecha DESDE LA GUI (cabecera X-Origen: gui) renombra el botón «Guardar tarea» a
+# «Guardar la tarea»: los casos planificados con el rótulo viejo fallan al ejecutar y el
+# healing tiene que encontrar el nuevo. Las altas por API (F1.7) no lo disparan, y la captura
+# de DOM de F2.1 no crea tareas, así que el plan siempre ve el rótulo original.
+_ROTULO_GUARDAR = "Guardar tarea"
+_ROTULO_GUARDAR_DERIVADO = "Guardar la tarea"
+_deriva = {"activa": os.environ.get("SUT_DERIVA_UI", "0") == "1", "derivada": False}
+
+
+class DerivaIn(BaseModel):
+    activa: bool
+
+
+@app.post("/__deriva", include_in_schema=False)
+def deriva(body: DerivaIn) -> dict:
+    """Activa o apaga el modo deriva y devuelve el rótulo al original."""
+    _deriva.update(activa=body.activa, derivada=False)
+    return dict(_deriva)
+
+
 @app.get("/", include_in_schema=False)
 def gui() -> HTMLResponse:
     # Las tareas actuales viajan en el HTML (window.__TAREAS__) para que la lista se pinte sin
@@ -66,8 +88,11 @@ def gui() -> HTMLResponse:
     if _CON_SEMILLA:
         _restaurar_semilla()
     datos = json.dumps(list(_tasks.values()), ensure_ascii=False).replace("</", "<\\/")
+    rotulo = _ROTULO_GUARDAR_DERIVADO if _deriva["derivada"] else _ROTULO_GUARDAR
     html = _GUI.read_text(encoding="utf-8").replace(
-        "</head>", f"<script>window.__TAREAS__={datos};</script></head>", 1)
+        "</head>", f"<script>window.__TAREAS__={datos};"
+                   f"window.__ROTULO_GUARDAR__={json.dumps(rotulo, ensure_ascii=False)};"
+                   "</script></head>", 1)
     return HTMLResponse(html)
 
 
@@ -102,11 +127,14 @@ def list_tasks() -> list[dict]:
 
 
 @app.post("/tasks", response_model=Task, status_code=201)
-def create_task(body: TaskIn) -> dict:
+def create_task(body: TaskIn, request: Request) -> dict:
     global _next_id
     task = {"id": _next_id, **body.model_dump()}
     _tasks[_next_id] = task
     _next_id += 1
+    # Modo deriva: solo un alta hecha desde la GUI renombra el botón (ver `_deriva`).
+    if _deriva["activa"] and request.headers.get("x-origen") == "gui":
+        _deriva["derivada"] = True
     return task
 
 

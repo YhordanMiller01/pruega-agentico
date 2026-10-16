@@ -44,3 +44,10 @@ Pantallas: `/#/tareas` (título "Lista de tareas"), `/#/tareas/nueva` (título "
 - AC-4: En la pantalla `/#/tareas`, al pulsar el botón "Completar Pagar la luz", aparece el mensaje "Tarea completada: Pagar la luz." y su estado pasa a "Hecha".
 - AC-5: En la pantalla `/#/tareas`, al pulsar el botón "Eliminar Llamar al médico", aparece el mensaje "Tarea eliminada: Llamar al médico." y esa fila deja de verse en la tabla.
 - AC-6: Al abrir la pantalla `/#/tareas/99999`, aparece el mensaje "La tarea no existe.".
+
+## HU-6: Lo que la lista de tareas no ofrece
+Como usuario quiero que la lista solo ofrezca las acciones que existen, para no borrar todo por error.
+Acceso: público, sin inicio de sesión, sin token ni usuario; cualquier visitante anónimo puede usarla. La interfaz se abre directamente en la pantalla indicada, sin pantalla de login.
+
+- AC-1: En la pantalla `/#/tareas` no aparece ningún botón para vaciar toda la lista de tareas de una vez.
+- AC-2: En la pantalla `/#/tareas`, después de pulsar el botón "Eliminar Llamar al médico", la fila "Llamar al médico" deja de verse en la tabla.
