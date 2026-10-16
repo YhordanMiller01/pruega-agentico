@@ -51,3 +51,12 @@ Acceso: público, sin inicio de sesión, sin token ni usuario; cualquier visitan
 
 - AC-1: En la pantalla `/#/tareas` no aparece ningún botón para vaciar toda la lista de tareas de una vez.
 - AC-2: En la pantalla `/#/tareas`, después de pulsar el botón "Eliminar Llamar al médico", la fila "Llamar al médico" deja de verse en la tabla.
+
+## HU-7: Buscar y filtrar mis tareas en la pantalla
+Como usuario quiero buscar y filtrar la lista para encontrar rápido una tarea.
+Acceso: público, sin inicio de sesión, sin token ni usuario; cualquier visitante anónimo puede usarla. La interfaz se abre directamente en la pantalla indicada, sin pantalla de login.
+La lista arranca con tres tareas precargadas: "Comprar pan", "Pagar la luz" y "Llamar al médico", todas en estado "Pendiente".
+
+- AC-1: En la pantalla `/#/tareas`, al escribir "pan" en el campo "Buscar tarea", la tabla muestra la fila "Comprar pan" y la fila "Pagar la luz" deja de verse.
+- AC-2: En la pantalla `/#/tareas`, al escribir "zzz" en el campo "Buscar tarea", aparece el mensaje "Ninguna tarea coincide con la búsqueda.".
+- AC-3: En la pantalla `/#/tareas`, después de pulsar el botón "Completar Pagar la luz" y marcar la casilla "Ocultar completadas", la fila "Pagar la luz" deja de verse y la fila "Comprar pan" sigue visible.

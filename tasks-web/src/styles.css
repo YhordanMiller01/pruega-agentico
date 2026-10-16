@@ -17,3 +17,6 @@ button { padding: 6px 12px; cursor: pointer; }
 .aviso { color: #1a7f37; }
 dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
 dt { font-weight: 600; }
+.filtros { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+.filtros input[type="search"] { padding: 6px; }
+.casilla { display: flex; gap: 6px; align-items: center; }
